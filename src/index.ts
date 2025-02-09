@@ -10,7 +10,9 @@ const app: Application = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(cors());
-app.use(bodyParser.json());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
 
 app.get('/', (req: Request, res: Response) => {
   res.send('Welcome to the TypeScript RESTful API!');

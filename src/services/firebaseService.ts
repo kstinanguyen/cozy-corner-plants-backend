@@ -22,7 +22,13 @@ export const getMotivationalPhrases = async () => {
     const ref = db.ref('motivational_phrases');
     const snapshot = await ref.once('value');
     const data = snapshot.val();
-    return snapshot.val() || [];
+
+    const phrasesArray = Object.entries(data || {}).map(([id, phraseData]) => ({
+      id: parseInt(id, 10),
+      phrase: (phraseData as { phrase: string })?.phrase || "",
+    }));
+
+    return phrasesArray;
   } catch (error) {
     console.error("Error retrieving phrases from Firebase:", error);
     return [];
@@ -47,5 +53,24 @@ export const cleanupFirebase = async () => {
     console.log('Firebase connection closed.');
   } catch (error) {
     console.error('Error during Firebase cleanup:', error);
+  }
+};
+
+export const manuallyPostPhrases = async (phrases: { id: number; phrase: string }[]) => {
+  try {
+    const db = admin.database();
+    const ref = db.ref('motivational_phrases');
+
+    await ref.remove();
+
+    for (const phrase of phrases) {
+      await ref.child(phrase.id.toString()).set({ phrase: phrase.phrase });
+    }
+
+    console.log("Phrases manually posted to Firebase.");
+    return true;
+  } catch (error) {
+    console.error("Error manually posting phrases:", error);
+    return false;
   }
 };
