@@ -41,9 +41,21 @@ export const generateMotivationalPhrases = async () => {
       throw new Error("No content text available in the response.");
     }
 
-    const phrases = content.split('\n').map((phrase, index) => ({
+    let phrasesArray;
+
+    try {
+      phrasesArray = JSON.parse(content);
+      if (!Array.isArray(phrasesArray)) {
+        throw new Error("Gemini response was not an array of objects")
+      }
+    } catch (parseError) {
+      console.warn("Gemini response was not valid JSON, using plain text fallback", parseError);
+      phrasesArray = content.split('\n').map(phrase => ({ phrase: phrase.trim() }));
+    }
+
+    const phrases = phrasesArray.map((phraseObj, index) => ({
       id: index + 1,
-      phrase: phrase.trim(),
+      phrase: phraseObj.phrase,
     }));
 
     return phrases;
