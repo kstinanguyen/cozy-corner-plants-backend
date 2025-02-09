@@ -5,14 +5,16 @@ import { getTestMotivationalPhrases } from './testData';
 const PHRASE_BATCH_SIZE = 9;
 const MIN_PHRASES_IN_DB = 1;
 
-export const updateMotivationalPhrases = async (useTestData = false) => {
+export const updateMotivationalPhrases = async () => {
   try {
     let newPhrases;
 
-    if (useTestData) {
-      newPhrases = getTestMotivationalPhrases();
-    } else {
+    try {
       newPhrases = await generateMotivationalPhrases();
+    } catch (geminiError) {
+      console.error("Error generating with Gemini:", geminiError);
+      console.error("Falling back to test data.");
+      newPhrases = getTestMotivationalPhrases();
     }
 
     await saveMotivationalPhrases(newPhrases);
@@ -28,7 +30,7 @@ export const generateMotivationalPhrases = async () => {
     const prompt = `I am designing a browser extension called Cozy Corner Plants. Please generate ${PHRASE_BATCH_SIZE} motivational phrases a plant might say to the player when they interact with it. These phrases should be positive, uplifting, and inspiring, encouraging growth and positivity. Please return just the list of phrases in plain text format, separated by line breaks, without any numbering or extra information.`;
 
     const result = await model.generateContent(prompt);
-    
+
     const candidates = result.response?.candidates || [];
     if (!candidates.length) {
       throw new Error("No candidates found in the response.");
@@ -47,13 +49,13 @@ export const generateMotivationalPhrases = async () => {
     return phrases;
 
   } catch (error) {
-    console.error("Error generating motivational phrases:", error);
+    console.error("Error generating motivational phrases with Gemini:", error);
     throw error;
   };
 }
 
 const getPhrases = (phrases: { id: number; phrase: string }[], numPhrases: number) => {
-  if (!phrases || phrases.length === 0) { // Check for null or undefined phrases
+  if (!phrases || phrases.length === 0) {
     return [];
   }
   const selectedPhrases = phrases.slice(0, numPhrases);
@@ -65,11 +67,10 @@ export const getPhrasesForPlant = async (numPhrases: number) => {
     const availPhrases = await getMotivationalPhrases();
 
     if (!availPhrases || availPhrases.length < MIN_PHRASES_IN_DB) {
-      const newPhrases = await generateMotivationalPhrases();
-      await saveMotivationalPhrases(newPhrases);
+      await updateMotivationalPhrases();
       const updatedPhrases = await getMotivationalPhrases();
       if (!updatedPhrases) {
-        throw new Error("Could not retrive phrases from database after re-generation")
+        throw new Error("Could not retrieve phrases from database after re-generation");
       }
       return getPhrases(updatedPhrases, numPhrases);
     }
@@ -80,9 +81,4 @@ export const getPhrasesForPlant = async (numPhrases: number) => {
   }
 };
 
-
-// Test data:
-updateMotivationalPhrases(true);
-
-// // // Gemini:
-// updateMotivationalPhrases();
+updateMotivationalPhrases();
