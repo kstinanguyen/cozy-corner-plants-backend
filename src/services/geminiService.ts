@@ -46,16 +46,6 @@ export const generateMotivationalPhrases = async () => {
 
     return phrases;
 
-    // try {
-    //   const phrases = JSON.parse(content).map((item: { phrase: string }, index: number) => ({
-    //     id: index + 1,
-    //     phrase: item.phrase,
-    //   }));
-    //   return phrases;
-    // } catch (e) {
-    //   console.error("Error parsing JSON:", e);
-    //   throw new Error("Invalid response from Gemini API.  Expected JSON array.");
-    // }
   } catch (error) {
     console.error("Error generating motivational phrases:", error);
     throw error;
