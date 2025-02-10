@@ -1,7 +1,6 @@
 import { Router } from 'express';
 import { generateMotivationalPhrases } from '../services/geminiService';
 import { getMotivationalPhrases, saveMotivationalPhrases, deleteMotivationalPhrases } from '../services/firebaseService';
-// import { getTestMotivationalPhrases } from '../services/testData';
 
 const router = Router();
 

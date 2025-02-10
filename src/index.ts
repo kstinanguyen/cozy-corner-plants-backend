@@ -1,6 +1,5 @@
 import express, { Application, Request, Response } from 'express';
 import cors from 'cors';
-import bodyParser from 'body-parser';
 import dotenv from 'dotenv';
 import geminiRoutes from './routes/geminiRoutes';
 

@@ -1,5 +1,4 @@
 import request from 'supertest';
-import dotenv from 'dotenv';
 import { app } from './index';
 import { beforeAll, afterAll, describe, it, expect } from '@jest/globals';
 import { mockFirebaseAdmin } from './__mocks__/firebaseAdmin';
@@ -25,7 +24,14 @@ describe('Gemini Routes', () => {
   });
 
   it('should handle POST requests to /api/phrases', async () => {
-    const response = await request(app).post('/api/phrases').send({ key: 'value' });
+    const phrases = [
+      { id: 1, phrase: 'Stay positive!' },
+      { id: 2, phrase: 'Keep going!' },
+      { id: 3, phrase: 'You can do it!' }
+    ];
+  
+    const response = await request(app).post('/api/phrases').send(phrases);
+  
     expect(response.status).toBe(200);
     expect(response.body.message).toBe('Phrases saved successfully!');
   });
