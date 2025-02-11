@@ -54,7 +54,7 @@ FIREBASE_CLIENT_CERT_URL=your-firebase-client-cert-url
 - Create API credentials for the Gemini service and obtain your API key.
 - Add your **Gemini API key** to the ```.env``` file. Example:
 ```env
-GEMINI_API_KEY=your-gemini-api-key
+API_KEY=your-gemini-api-key
 ```
 
 ### 5. Start the backend server:
